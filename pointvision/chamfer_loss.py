@@ -236,24 +236,3 @@ class ChamferLoss6D(nn.Module):
         loss = self.forward(predict_pc, gt_pc)
         # print(time.time()-start_time)
         return loss
-
-# if __name__=='__main__':
-#     opt=Options().parse()
-#     testset = Modelset_Loader(opt.dataroot, 'test', opt)
-#     testloader = torch.utils.data.DataLoader(testset, batch_size=opt.batch_size, shuffle=True,
-#                                              num_workers=0)
-#     index = 0
-#     chamferloss = ChamferLoss(opt).to(opt.device)
-#     for i, data in enumerate(testloader):
-#         pc=data[0].to(opt.device)
-#         ipc=data[1].to(opt.device)
-#         a=chamferloss(pc,ipc).cpu()
-#         b = chamferloss(pc, pc).cpu()
-#         print(len(data))
-#         print(a)
-#         print(b)
-#         print(a>b)
-#         # saveNfeaturedBatchPointCloud('./pc', 'pc_', index, [data[0]])
-#         # saveNfeaturedBatchPointCloud('./ipc', 'ipc_', index, [data[1], data[2]])
-#         # saveNfeaturedBatchPointCloud('./som', 'som_', index, [data[3]])
-#         index = index + len(data)

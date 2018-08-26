@@ -12,17 +12,18 @@ import numpy as np
 from numba import jit
 
 
-def computeCovarianceMatrix(points):
+def pointcloudCovarianceMatrix(points):
     '''
-    :param points: N*3
+    :param points: N*3 tensor
     :return:
     '''
-    covarianceMatrix = torch.zeros(B, 9)
+    covarianceMatrix = torch.zeros(9)
     means = points.mean(dim=0).unsqueeze(0).expand_as(points)
-    for index in range(9):
-        i = index // 3
-        j = index % 3
-        covarianceMatrix[index] = ((means[:, i] - points[:, i]) * (means[:, j] - points[:, j])).mean()
+    for i in range(3):
+        row_begin = i * 3
+        for j in range(3):
+            index = row_begin + j
+            covarianceMatrix[index] = ((means[:, i] - points[:, i]) * (means[:, j] - points[:, j])).mean()
     return covarianceMatrix
 
 
@@ -67,7 +68,7 @@ def build_A_matrix_torch(min_idx):
 
 
 # 计算每个点的协方差矩阵
-def perPointCovarianceMatrix(points, k, input_channels=3):
+def perPointKCovarianceMatrix(points, k, input_channels=3):
     '''
     :param points: ndarray of N*input_channels
     :return: torch tensor of input_channels^2 *N
@@ -81,15 +82,14 @@ def perPointCovarianceMatrix(points, k, input_channels=3):
 
     # A=build_A_matrix_torch(min_idx)
 
-
     neighbors = torch.Tensor([np.take(points, i, axis=0) for i in min_idx])  # N*K*input_channels
     means = neighbors.mean(dim=1).unsqueeze(1).expand_as(neighbors)  # N*input_channels
-    for index in range(input_channels ** 2):
-        i = index // input_channels
-        j = index % input_channels
-        covarianceMatrix[:, index] = (
-                (means[:, :, i] - neighbors[:, :, i]) * (means[:, :, j] - neighbors[:, :, j])).mean(dim=1)
-
+    for i in range(input_channels):
+        row_begin = i * input_channels
+        for j in range(input_channels):
+            index = row_begin + j
+            covarianceMatrix[:, index] = (
+                    (means[:, :, i] - neighbors[:, :, i]) * (means[:, :, j] - neighbors[:, :, j])).mean(dim=1)
 
     # input_channels^2 x N ,k x N
     return covarianceMatrix.transpose(0, 1), min_idx.transpose(0, 1)
