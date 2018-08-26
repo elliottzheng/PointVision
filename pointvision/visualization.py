@@ -2,17 +2,27 @@
 # @Time    : 2018/8/19 0019 13:04
 # @Author  : Yinglin Zheng
 # @Email   : zhengyinglin@stu.xmu.edu.cn
-# @FileName: visualize.py
+# @FileName: visualization.py
 # @Software: PyCharm
 # @Affiliation: XMU IPIC
-from pointvision.preprocess import *
+
+from pointvision.color_process import *
 import torch
 import numpy as np
 
 def plot_color_pointcloud_with_som(pc, title, vis, win=None, som=None,unnormalize=False):
+    '''
+    :param pc: tensor of B x C x N in cuda, C>=6
+    :param title:
+    :param vis:
+    :param win:
+    :param som: tensor of B x C x N in cuda
+    :param unnormalize:
+    :return:
+    '''
     pc = pc[0].cpu().numpy().transpose()
     if unnormalize:
-        pc[:, 3:6] =color_unnormalize(pc_color_np=pc[:, 3:6])
+        pc[:, 3:6] =color_unnormalize(pc_color=pc[:, 3:6])
     if som is not None:
         som_np= som[0].cpu().numpy().transpose()
         red = torch.Tensor([255, 0, 0]).unsqueeze(0).expand((som_np.shape[0],3)).numpy()

@@ -68,9 +68,8 @@ class ChamferLoss3D(nn.Module):
         :param gt_pc: Bxinput_channelsxN Variable in GPU, ground truth
         :return:
         '''
-        predict_pc=predict_pc[:,:3,:].ascontiguousarray()
-        gt_pc= gt_pc[:, :3, :].ascontiguousarray()
-
+        predict_pc = predict_pc[:, :3, :].ascontiguousarray()
+        gt_pc = gt_pc[:, :3, :].ascontiguousarray()
 
         predict_pc_size = predict_pc.size()
         gt_pc_size = gt_pc.size()
@@ -115,14 +114,11 @@ class ChamferLoss3D(nn.Module):
             selected_gt_by_predict - predict_pc.unsqueeze(1).expand_as(selected_gt_by_predict))
         forward_loss = forward_loss_element.mean()  # this is what i said, we need to take mean
 
-
-
         backward_loss_element = robust_norm(
             selected_predict_by_gt - gt_pc.unsqueeze(1).expand_as(selected_predict_by_gt))  # BxkxN
         backward_loss = backward_loss_element.mean()
 
-
-        return forward_loss + backward_loss  # + self.sparsity_loss
+        return forward_loss + backward_loss
 
     def __call__(self, predict_pc, gt_pc):
 
@@ -131,12 +127,11 @@ class ChamferLoss3D(nn.Module):
         return loss
 
 
-
 class ChamferLoss6D(nn.Module):
     def __init__(self, opt):
         super(ChamferLoss6D, self).__init__()
         self.opt = opt
-        self.dimension =6  # you can modified this to change dimension
+        self.dimension = 6  # you can modified this to change dimension
 
         self.k = 1  # which means finding the nearest point
 
